@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Variables — Bloc opératoire</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f4f6f8;color:#17202a}
+header{background:#17324d;color:white;padding:22px 18px;text-align:center}
+header h1{margin:0;font-size:24px}
+header p{margin:7px 0 0;opacity:.85}
+.container{max-width:1000px;margin:20px auto;padding:0 15px}
+.card{background:white;border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 3px 14px #00000012}
+label{font-weight:700;display:block;margin-bottom:7px}
+input[type=text],select{width:100%;padding:14px 12px;border:1px solid #ccd3da;border-radius:9px;font-size:16px}
+.controls{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+button{border:0;border-radius:9px;padding:14px 16px;font-size:15px;font-weight:700;cursor:pointer;min-height:48px}
+.primary{background:#17324d;color:white}
+.secondary{background:#e9eef3;color:#17324d}
+.danger{background:#fbe8e8;color:#a32020}
+.fileBtn{display:flex;align-items:center;justify-content:center;background:#e9eef3;color:#17324d;padding:14px 16px;border-radius:9px;font-weight:700;cursor:pointer;min-height:48px;font-size:16px}
+#photosInput{display:none}
+.photo-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin-top:15px}
+.photo-item{border:1px solid #dce2e7;border-radius:10px;padding:8px;background:#fafafa}
+.photo-item img{width:100%;height:150px;object-fit:contain;background:white;border-radius:7px}
+.photo-actions{display:flex;gap:6px;margin-top:7px}
+.photo-actions button{padding:10px 4px;font-size:13px;flex:1;min-height:40px}
+.empty{text-align:center;color:#68737d;padding:22px;border:2px dashed #d7dde2;border-radius:10px}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.note{font-size:13px;color:#65717c;margin-top:8px}
+.bottom-space{height:0}
+#preview{margin-top:20px}
+.a4{width:210mm;min-height:297mm;background:white;margin:0 auto 18px;padding:10mm;box-shadow:0 2px 14px #0002;display:flex;flex-direction:column}
+.a4.landscape{width:297mm;min-height:210mm}
+.page-header{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:6mm;padding-bottom:3mm;border-bottom:2px solid #17324d;font-size:12px;color:#4a5560}
+.page-header .pname{font-weight:700;font-size:16px;color:#17324d}
+.photo-grid{flex:1 1 auto;display:grid;gap:6mm;align-content:stretch}
+.photo-grid.portrait.c4{grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(2,1fr)}
+.photo-grid.portrait.c6{grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(3,1fr)}
+.photo-grid.portrait.c8{grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(4,1fr)}
+.photo-grid.landscape.c4{grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(2,1fr)}
+.photo-grid.landscape.c6{grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr)}
+.photo-grid.landscape.c8{grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(2,1fr)}
+.print-item{border:1px dashed #777;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#fff}
+.print-item img{width:100%;height:100%;object-fit:contain}
+@media screen and (max-width:700px){
+ .controls{grid-template-columns:1fr}
+ .a4{transform-origin:top left;transform:scale(.43);margin-bottom:-165mm}
+ .a4.landscape{transform:scale(.36);margin-bottom:-130mm}
+ .container{padding:0 12px calc(90px + env(safe-area-inset-bottom))}
+ header h1{font-size:19px}
+ header p{font-size:13px}
+ .desktop-actions{display:none}
+ .mobile-actions{display:flex!important}
+}
+.mobile-actions{display:none;position:fixed;left:0;right:0;bottom:0;gap:8px;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:white;box-shadow:0 -2px 12px #00000022;z-index:50}
+.mobile-actions button{flex:1;margin:0}
+@media print{
+ body{background:white}
+ header,.controls-card,.no-print{display:none!important}
+ .container{max-width:none;margin:0;padding:0}
+ #preview{margin:0}
+ .a4{box-shadow:none;margin:0;padding:10mm;page-break-after:always}
+ .a4:last-child{page-break-after:auto}
+}
+</style>
+</head>
+<body>
+<header>
+<h1>VARIABLES — BLOC OPÉRATOIRE</h1>
+<p>Préparation automatique des photos pour impression A4</p>
+</header>
+
+<div class="container">
+<section class="card controls-card">
+<label for="name">Nom du personnel</label>
+<input id="name" type="text" placeholder="Ex. Ahmed Alaoui">
+
+<div style="height:14px"></div>
+<label for="photosInput" class="fileBtn">📷 Ajouter plusieurs photos</label>
+<input id="photosInput" type="file" accept="image/*" multiple>
+<div class="note">Vous pouvez sélectionner 10, 15, 20 photos ou plus en une seule fois.</div>
+
+<div class="controls" style="margin-top:16px">
+<div>
+<label for="perPage">Photos par page</label>
+<select id="perPage">
+<option value="4">4</option>
+<option value="6" selected>6</option>
+<option value="8">8</option>
+</select>
+</div>
+<div>
+<label for="orientation">Orientation A4</label>
+<select id="orientation">
+<option value="portrait" selected>Portrait</option>
+<option value="landscape">Paysage</option>
+</select>
+</div>
+<div>
+<label for="fit">Présentation</label>
+<select id="fit">
+<option value="contain" selected>Image entière</option>
+<option value="cover">Remplir le cadre</option>
+</select>
+</div>
+</div>
+
+<div class="actions desktop-actions" style="margin-top:16px">
+<button class="primary" onclick="window.print()">📄 Générer / imprimer le PDF</button>
+<button class="secondary" onclick="clearAll()">Tout effacer</button>
+</div>
+<div class="note">Dans la fenêtre d'impression, choisissez « Enregistrer au format PDF » et le format papier A4.</div>
+</section>
+<div class="mobile-actions no-print">
+<button class="secondary" onclick="clearAll()">Tout effacer</button>
+<button class="primary" onclick="window.print()">📄 Générer le PDF</button>
+</div>
+
+<section class="card no-print">
+<h3 style="margin-top:0">Photos sélectionnées</h3>
+<div id="photoList" class="empty">Aucune photo ajoutée.</div>
+</section>
+
+<section id="preview"></section>
+</div>
+
+<script>
+const input=document.getElementById('photosInput');
+const list=document.getElementById('photoList');
+const preview=document.getElementById('preview');
+let photos=[];
+
+input.addEventListener('change', e=>{
+  [...e.target.files].forEach(file=>{
+    if(!file.type.startsWith('image/')) return;
+    const url=URL.createObjectURL(file);
+    photos.push({url, rotation:0});
+  });
+  render();
+  input.value='';
+});
+
+document.getElementById('name').addEventListener('input',render);
+document.getElementById('perPage').addEventListener('change',render);
+document.getElementById('orientation').addEventListener('change',render);
+document.getElementById('fit').addEventListener('change',render);
+
+function render(){
+  if(!photos.length){
+    list.className='empty'; list.textContent='Aucune photo ajoutée.';
+    preview.innerHTML=''; return;
+  }
+  list.className='photo-list';
+  list.innerHTML='';
+  photos.forEach((p,i)=>{
+    const box=document.createElement('div'); box.className='photo-item';
+    box.innerHTML=`<img src="${p.url}" style="transform:rotate(${p.rotation}deg)">
+      <div class="photo-actions">
+        <button class="secondary" onclick="rotatePhoto(${i})">↻ Rotation</button>
+        <button class="danger" onclick="removePhoto(${i})">✕</button>
+      </div>`;
+    list.appendChild(box);
+  });
+
+  const n=Number(document.getElementById('perPage').value);
+  const orientation=document.getElementById('orientation').value;
+  const fit=document.getElementById('fit').value;
+  const name=document.getElementById('name').value.trim();
+
+  preview.innerHTML='';
+  const totalPages=Math.ceil(photos.length/n);
+  const today=new Date().toLocaleDateString('fr-FR');
+  let pageNum=0;
+  for(let start=0;start<photos.length;start+=n){
+    pageNum++;
+    const page=document.createElement('div');
+    page.className=`a4 ${orientation}`;
+
+    const header=document.createElement('div');
+    header.className='page-header';
+    const pnameSpan=document.createElement('span');
+    pnameSpan.className='pname';
+    pnameSpan.textContent=name?name:'—';
+    const metaSpan=document.createElement('span');
+    metaSpan.textContent=`${today} — Page ${pageNum}/${totalPages}`;
+    header.appendChild(pnameSpan);
+    header.appendChild(metaSpan);
+    page.appendChild(header);
+
+    const grid=document.createElement('div');
+    grid.className=`photo-grid ${orientation} c${n}`;
+    for(let j=start;j<Math.min(start+n,photos.length);j++){
+      const item=document.createElement('div'); item.className='print-item';
+      const img=document.createElement('img');
+      img.src=photos[j].url;
+      img.style.objectFit=fit;
+      img.style.transform=`rotate(${photos[j].rotation}deg)`;
+      item.appendChild(img); grid.appendChild(item);
+    }
+    page.appendChild(grid);
+    preview.appendChild(page);
+  }
+}
+function rotatePhoto(i){photos[i].rotation=(photos[i].rotation+90)%360;render()}
+function removePhoto(i){URL.revokeObjectURL(photos[i].url);photos.splice(i,1);render()}
+function clearAll(){
+  photos.forEach(p=>URL.revokeObjectURL(p.url));
+  photos=[]; document.getElementById('name').value=''; render();
+}
+render();
+</script>
+</body>
+</html>
