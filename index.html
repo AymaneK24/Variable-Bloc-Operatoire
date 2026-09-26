@@ -21,29 +21,36 @@ button{border:0;border-radius:9px;padding:14px 16px;font-size:15px;font-weight:7
 .danger{background:#fbe8e8;color:#a32020}
 .fileBtn{display:flex;align-items:center;justify-content:center;background:#e9eef3;color:#17324d;padding:14px 16px;border-radius:9px;font-weight:700;cursor:pointer;min-height:48px;font-size:16px}
 #photosInput{display:none}
-.photo-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin-top:15px}
+.photo-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-top:15px}
 .photo-item{border:1px solid #dce2e7;border-radius:10px;padding:8px;background:#fafafa}
-.photo-item img{width:100%;height:150px;object-fit:contain;background:white;border-radius:7px}
+.thumb-wrap{position:relative;overflow:hidden;border-radius:7px;background:#fff;touch-action:none;cursor:grab;border:1px solid #e3e8ec}
+.thumb-wrap:active{cursor:grabbing}
+.thumb-wrap img{width:100%;height:100%;display:block;object-fit:contain;user-select:none;-webkit-user-drag:none;pointer-events:none}
+.thumb-hint{position:absolute;bottom:3px;right:5px;background:#00000055;color:#fff;font-size:10px;padding:2px 5px;border-radius:5px;pointer-events:none}
+.zoom-row{display:flex;align-items:center;gap:8px;margin-top:8px}
+.zoom-row span{font-size:12px;color:#65717c;width:34px;text-align:right}
+.zoom-row input[type=range]{flex:1}
 .photo-actions{display:flex;gap:6px;margin-top:7px}
-.photo-actions button{padding:10px 4px;font-size:13px;flex:1;min-height:40px}
+.photo-actions button{padding:10px 4px;font-size:12px;flex:1;min-height:40px}
 .empty{text-align:center;color:#68737d;padding:22px;border:2px dashed #d7dde2;border-radius:10px}
 .actions{display:flex;gap:10px;flex-wrap:wrap}
 .note{font-size:13px;color:#65717c;margin-top:8px}
-.bottom-space{height:0}
+.tip{font-size:13px;color:#1b5e20;background:#eef7ef;border:1px solid #d3ecd6;border-radius:9px;padding:10px 12px;margin-top:12px}
 #preview{margin-top:20px}
-.a4{width:210mm;min-height:297mm;background:white;margin:0 auto 18px;padding:10mm;box-shadow:0 2px 14px #0002;display:flex;flex-direction:column}
-.a4.landscape{width:297mm;min-height:210mm}
-.page-header{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:6mm;padding-bottom:3mm;border-bottom:2px solid #17324d;font-size:12px;color:#4a5560}
+.a4{width:210mm;height:297mm;background:white;margin:0 auto 18px;padding:10mm;box-shadow:0 2px 14px #0002;display:flex;flex-direction:column;overflow:hidden;page-break-after:always;break-after:page;page-break-inside:avoid;break-inside:avoid}
+.a4.landscape{width:297mm;height:210mm}
+.a4:last-child{page-break-after:auto;break-after:auto}
+.page-header{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:6mm;padding-bottom:3mm;border-bottom:2px solid #17324d;font-size:12px;color:#4a5560;flex:0 0 auto}
 .page-header .pname{font-weight:700;font-size:16px;color:#17324d}
-.photo-grid{flex:1 1 auto;display:grid;gap:6mm;align-content:stretch}
+.photo-grid{flex:1 1 auto;min-height:0;display:grid;gap:6mm}
 .photo-grid.portrait.c4{grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(2,1fr)}
 .photo-grid.portrait.c6{grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(3,1fr)}
 .photo-grid.portrait.c8{grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(4,1fr)}
 .photo-grid.landscape.c4{grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(2,1fr)}
 .photo-grid.landscape.c6{grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr)}
 .photo-grid.landscape.c8{grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(2,1fr)}
-.print-item{border:1px dashed #777;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#fff}
-.print-item img{width:100%;height:100%;object-fit:contain}
+.print-item{border:1px dashed #777;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#fff;min-height:0;min-width:0;break-inside:avoid;page-break-inside:avoid}
+.print-item img{width:100%;height:100%;object-fit:contain;display:block}
 @media screen and (max-width:700px){
  .controls{grid-template-columns:1fr}
  .a4{transform-origin:top left;transform:scale(.43);margin-bottom:-165mm}
@@ -61,8 +68,7 @@ button{border:0;border-radius:9px;padding:14px 16px;font-size:15px;font-weight:7
  header,.controls-card,.no-print{display:none!important}
  .container{max-width:none;margin:0;padding:0}
  #preview{margin:0}
- .a4{box-shadow:none;margin:0;padding:10mm;page-break-after:always}
- .a4:last-child{page-break-after:auto}
+ .a4{box-shadow:none;margin:0}
 }
 </style>
 </head>
@@ -107,11 +113,13 @@ button{border:0;border-radius:9px;padding:14px 16px;font-size:15px;font-weight:7
 </div>
 </div>
 
+<div class="tip">💡 Sur chaque photo ci-dessous : glissez pour repositionner, utilisez le curseur pour zoomer.</div>
+
 <div class="actions desktop-actions" style="margin-top:16px">
 <button class="primary" onclick="window.print()">📄 Générer / imprimer le PDF</button>
 <button class="secondary" onclick="clearAll()">Tout effacer</button>
 </div>
-<div class="note">Dans la fenêtre d'impression, choisissez « Enregistrer au format PDF » et le format papier A4.</div>
+<div class="note">Dans la fenêtre d'impression, choisissez « Enregistrer au format PDF », le format papier A4, <strong>et désactivez « En-têtes et pieds de page »</strong> pour un PDF sans URL ni date en bas de page.</div>
 </section>
 <div class="mobile-actions no-print">
 <button class="secondary" onclick="clearAll()">Tout effacer</button>
@@ -136,7 +144,7 @@ input.addEventListener('change', e=>{
   [...e.target.files].forEach(file=>{
     if(!file.type.startsWith('image/')) return;
     const url=URL.createObjectURL(file);
-    photos.push({url, rotation:0});
+    photos.push({url, rotation:0, scale:1, offsetX:0, offsetY:0});
   });
   render();
   input.value='';
@@ -147,64 +155,159 @@ document.getElementById('perPage').addEventListener('change',render);
 document.getElementById('orientation').addEventListener('change',render);
 document.getElementById('fit').addEventListener('change',render);
 
-function render(){
-  if(!photos.length){
-    list.className='empty'; list.textContent='Aucune photo ajoutée.';
-    preview.innerHTML=''; return;
-  }
-  list.className='photo-list';
-  list.innerHTML='';
-  photos.forEach((p,i)=>{
-    const box=document.createElement('div'); box.className='photo-item';
-    box.innerHTML=`<img src="${p.url}" style="transform:rotate(${p.rotation}deg)">
-      <div class="photo-actions">
-        <button class="secondary" onclick="rotatePhoto(${i})">↻ Rotation</button>
-        <button class="danger" onclick="removePhoto(${i})">✕</button>
-      </div>`;
-    list.appendChild(box);
-  });
+function photoTransform(p){
+  return `translate(${p.offsetX}%, ${p.offsetY}%) scale(${p.scale}) rotate(${p.rotation}deg)`;
+}
+function updateTransformFor(i){
+  const str=photoTransform(photos[i]);
+  document.querySelectorAll(`img[data-idx="${i}"]`).forEach(el=>{ el.style.transform=str; });
+}
 
+// approximate frame width/height ratio, used only to shape the editing thumbnail like the real printed cell
+function frameGrid(n, orientation){
+  const map={
+    portrait:{4:[2,2],6:[2,3],8:[2,4]},
+    landscape:{4:[2,2],6:[3,2],8:[4,2]}
+  };
+  return map[orientation][n];
+}
+function computeCellSize(n, orientation){
+  const [cols,rows]=frameGrid(n, orientation);
+  const pageW=orientation==='portrait'?210:297;
+  const pageH=orientation==='portrait'?297:210;
+  const innerW=pageW-20;
+  const innerH=pageH-20-18; // minus padding + approx header block
+  const gap=6;
+  const cellW=(innerW-gap*(cols-1))/cols;
+  const cellH=(innerH-gap*(rows-1))/rows;
+  return {cellW, cellH};
+}
+function updatePageStyle(orientation){
+  let styleEl=document.getElementById('pageSizeStyle');
+  if(!styleEl){ styleEl=document.createElement('style'); styleEl.id='pageSizeStyle'; document.head.appendChild(styleEl); }
+  styleEl.textContent=`@page{size:A4 ${orientation};margin:0}`;
+}
+
+function attachDrag(wrap, i){
+  let dragging=false, startX=0, startY=0, startOffX=0, startOffY=0, rect=null;
+  wrap.addEventListener('pointerdown', e=>{
+    dragging=true;
+    try{ wrap.setPointerCapture(e.pointerId); }catch(_){}
+    rect=wrap.getBoundingClientRect();
+    startX=e.clientX; startY=e.clientY;
+    startOffX=photos[i].offsetX; startOffY=photos[i].offsetY;
+  });
+  wrap.addEventListener('pointermove', e=>{
+    if(!dragging || !rect) return;
+    const dxPct=(e.clientX-startX)/rect.width*100;
+    const dyPct=(e.clientY-startY)/rect.height*100;
+    photos[i].offsetX=Math.max(-60,Math.min(60,startOffX+dxPct));
+    photos[i].offsetY=Math.max(-60,Math.min(60,startOffY+dyPct));
+    updateTransformFor(i);
+  });
+  function end(e){
+    dragging=false;
+    try{ wrap.releasePointerCapture(e.pointerId); }catch(_){}
+  }
+  wrap.addEventListener('pointerup', end);
+  wrap.addEventListener('pointercancel', end);
+}
+
+function render(){
   const n=Number(document.getElementById('perPage').value);
   const orientation=document.getElementById('orientation').value;
   const fit=document.getElementById('fit').value;
   const name=document.getElementById('name').value.trim();
 
+  updatePageStyle(orientation);
+
+  if(!photos.length){
+    list.className='empty'; list.textContent='Aucune photo ajoutée.';
+    preview.innerHTML=''; return;
+  }
+
+  const {cellW,cellH}=computeCellSize(n, orientation);
+
+  // thumbnail / editing list
+  list.className='photo-list';
+  list.innerHTML='';
+  photos.forEach((p,i)=>{
+    const box=document.createElement('div'); box.className='photo-item';
+
+    const wrap=document.createElement('div');
+    wrap.className='thumb-wrap';
+    wrap.style.aspectRatio=`${cellW} / ${cellH}`;
+    const img=document.createElement('img');
+    img.src=p.url; img.dataset.idx=i;
+    img.style.objectFit=fit;
+    img.style.transform=photoTransform(p);
+    wrap.appendChild(img);
+    const hint=document.createElement('div'); hint.className='thumb-hint'; hint.textContent='⤡ glisser';
+    wrap.appendChild(hint);
+    attachDrag(wrap, i);
+    box.appendChild(wrap);
+
+    const zoomRow=document.createElement('div'); zoomRow.className='zoom-row';
+    const zLabel=document.createElement('span'); zLabel.textContent='🔍';
+    const zoom=document.createElement('input');
+    zoom.type='range'; zoom.min='50'; zoom.max='300'; zoom.step='5';
+    zoom.value=Math.round(p.scale*100);
+    zoom.addEventListener('input', ()=>{ photos[i].scale=Number(zoom.value)/100; updateTransformFor(i); });
+    const zVal=document.createElement('span'); zVal.textContent=Math.round(p.scale*100)+'%';
+    zoom.addEventListener('input', ()=>{ zVal.textContent=zoom.value+'%'; });
+    zoomRow.appendChild(zLabel); zoomRow.appendChild(zoom); zoomRow.appendChild(zVal);
+    box.appendChild(zoomRow);
+
+    const actions=document.createElement('div'); actions.className='photo-actions';
+    const rotateBtn=document.createElement('button'); rotateBtn.className='secondary'; rotateBtn.textContent='↻ Rotation';
+    rotateBtn.addEventListener('click', ()=>{ photos[i].rotation=(photos[i].rotation+90)%360; updateTransformFor(i); });
+    const resetBtn=document.createElement('button'); resetBtn.className='secondary'; resetBtn.textContent='⟲ Réinit.';
+    resetBtn.addEventListener('click', ()=>{
+      photos[i].scale=1; photos[i].offsetX=0; photos[i].offsetY=0;
+      zoom.value=100; zVal.textContent='100%';
+      updateTransformFor(i);
+    });
+    const removeBtn=document.createElement('button'); removeBtn.className='danger'; removeBtn.textContent='✕';
+    removeBtn.addEventListener('click', ()=>{ removePhoto(i); });
+    actions.appendChild(rotateBtn); actions.appendChild(resetBtn); actions.appendChild(removeBtn);
+    box.appendChild(actions);
+
+    list.appendChild(box);
+  });
+
+  // print pages
   preview.innerHTML='';
   const totalPages=Math.ceil(photos.length/n);
   const today=new Date().toLocaleDateString('fr-FR');
   let pageNum=0;
-  for(let start=0;start<photos.length;start+=n){
+  for(let start=0; start<photos.length; start+=n){
     pageNum++;
     const page=document.createElement('div');
     page.className=`a4 ${orientation}`;
 
     const header=document.createElement('div');
     header.className='page-header';
-    const pnameSpan=document.createElement('span');
-    pnameSpan.className='pname';
-    pnameSpan.textContent=name?name:'—';
-    const metaSpan=document.createElement('span');
-    metaSpan.textContent=`${today} — Page ${pageNum}/${totalPages}`;
-    header.appendChild(pnameSpan);
-    header.appendChild(metaSpan);
+    const pnameSpan=document.createElement('span'); pnameSpan.className='pname'; pnameSpan.textContent=name?name:'—';
+    const metaSpan=document.createElement('span'); metaSpan.textContent=`${today} — Page ${pageNum}/${totalPages}`;
+    header.appendChild(pnameSpan); header.appendChild(metaSpan);
     page.appendChild(header);
 
     const grid=document.createElement('div');
     grid.className=`photo-grid ${orientation} c${n}`;
-    for(let j=start;j<Math.min(start+n,photos.length);j++){
+    for(let j=start; j<Math.min(start+n, photos.length); j++){
       const item=document.createElement('div'); item.className='print-item';
       const img=document.createElement('img');
-      img.src=photos[j].url;
+      img.src=photos[j].url; img.dataset.idx=j;
       img.style.objectFit=fit;
-      img.style.transform=`rotate(${photos[j].rotation}deg)`;
+      img.style.transform=photoTransform(photos[j]);
       item.appendChild(img); grid.appendChild(item);
     }
     page.appendChild(grid);
     preview.appendChild(page);
   }
 }
-function rotatePhoto(i){photos[i].rotation=(photos[i].rotation+90)%360;render()}
-function removePhoto(i){URL.revokeObjectURL(photos[i].url);photos.splice(i,1);render()}
+
+function removePhoto(i){ URL.revokeObjectURL(photos[i].url); photos.splice(i,1); render(); }
 function clearAll(){
   photos.forEach(p=>URL.revokeObjectURL(p.url));
   photos=[]; document.getElementById('name').value=''; render();
